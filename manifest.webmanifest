@@ -1,0 +1,23 @@
+{
+  "name": "FLOWORA — Cycle & Wellness",
+  "short_name": "FLOWORA",
+  "description": "Private cycle awareness and daily wellness tracking.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#100914",
+  "theme_color": "#100914",
+  "categories": [
+    "health",
+    "lifestyle"
+  ],
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
