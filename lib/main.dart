@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 const floworaUrl = 'https://geminimodel-git.github.io/FlowOra2.0/';
@@ -77,17 +78,20 @@ class _FloworaWebViewState extends State<FloworaWebView> {
       ..loadRequest(Uri.parse(floworaUrl));
   }
 
-  Future<bool> _handleBack() async {
+  Future<void> _handleBack() async {
     if (await _controller.canGoBack()) {
       await _controller.goBack();
-      return false;
+    } else {
+      await SystemNavigator.pop();
     }
-    return true;
   }
 
   @override
-  Widget build(BuildContext context) => WillPopScope(
-        onWillPop: _handleBack,
+  Widget build(BuildContext context) => PopScope<Object?>(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) {
+          if (!didPop) _handleBack();
+        },
         child: Scaffold(
           body: SafeArea(
             child: Stack(
