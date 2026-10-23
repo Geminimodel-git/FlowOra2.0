@@ -23,7 +23,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -50,6 +50,17 @@ jobs:
           EOF
           npx cap add android
           npx cap sync android
+
+      - name: Resolve legacy Kotlin stdlib duplicates
+        run: |
+          cat >> android/app/build.gradle <<'EOF'
+
+          // Avoid duplicate classes from legacy split Kotlin standard-library artifacts.
+          configurations.configureEach {
+              exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
+              exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
+          }
+          EOF
 
       - name: Build debug APK
         run: |
