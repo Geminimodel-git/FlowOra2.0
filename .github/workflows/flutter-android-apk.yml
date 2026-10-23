@@ -1,0 +1,52 @@
+name: FLOWORA Flutter Android APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, feat/flutter-android-wrapper]
+    paths:
+      - 'lib/**'
+      - 'pubspec.yaml'
+      - '.github/workflows/flutter-android-apk.yml'
+      - 'README-FLUTTER.md'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Generate Android platform scaffold
+        run: |
+          flutter create --platforms=android --org com.minnsaqii --project-name flowora /tmp/flowora-platform
+          cp -R /tmp/flowora-platform/android ./android
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('android/app/src/main/AndroidManifest.xml')
+          s = p.read_text()
+          if 'android.permission.INTERNET' not in s:
+              s = s.replace('<manifest xmlns:android="http://schemas.android.com/apk/res/android">', '<manifest xmlns:android="http://schemas.android.com/apk/res/android">\\n    <uses-permission android:name="android.permission.INTERNET" />')
+          if 'android:hardwareAccelerated=' not in s:
+              s = s.replace('<application', '<application android:hardwareAccelerated="true"')
+          s = s.replace('android:label="flowora"', 'android:label="FLOWORA 2.0"')
+          p.write_text(s)
+          PY
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Analyze and test
+        run: |
+          flutter analyze
+          flutter test
+      - name: Build release APKs (ARMv7 + ARM64)
+        run: flutter build apk --release --split-per-abi
+      - name: Upload release APKs
+        uses: actions/upload-artifact@v4
+        with:
+          name: FLOWORA-2.0-release-apks
+          path: build/app/outputs/flutter-apk/*.apk
+          if-no-files-found: error
+          retention-days: 14
