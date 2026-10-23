@@ -5,6 +5,7 @@ on:
     branches: [main, feat/flutter-android-wrapper]
     paths:
       - 'lib/**'
+      - 'test/**'
       - 'pubspec.yaml'
       - '.github/workflows/flutter-android-apk.yml'
       - 'README-FLUTTER.md'
